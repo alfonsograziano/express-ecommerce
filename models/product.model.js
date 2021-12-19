@@ -1,7 +1,10 @@
 const mongoose = require("mongoose")
 const Schema = mongoose.Schema
 
+const Currencies = require("../config/currencies")
+const currencies = Currencies.map(item => item.symbol)
 const EUR = "EUR"
+
 
 const productSchema = new Schema({
     name: {
@@ -18,7 +21,8 @@ const productSchema = new Schema({
     currency: {
         type: String,
         required: true,
-        default: EUR
+        default: EUR,
+        enum: Object.values(currencies),
     },
     images: {
         primary: String,

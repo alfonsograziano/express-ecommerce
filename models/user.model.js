@@ -48,6 +48,10 @@ const userSchema = new Schema({
             default: Languages.EN
         },
     },
+    orders:[{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Order'
+    }]
 }, {
     timestamps: true,
 })
