@@ -3,8 +3,10 @@ const UserRoles = require("../config/userRoles")
 const { validationResult } = require('express-validator')
 const bcrypt = require('bcryptjs')
 const keys = require("../config/keys")
-const jwt = require('jsonwebtoken')
-
+const {
+    generateMainToken,
+    generateSessionToken,
+} = require("simple-jwt-auth-protocol")
 
 const createUser = async (req, res) => {
     const errors = validationResult(req)
@@ -27,7 +29,8 @@ const createUser = async (req, res) => {
         lastName,
         firstLogin: true,
         isActive: false,
-        roles: [UserRoles.USER]
+        roles: [UserRoles.USER],
+        lastPasswordChange: new Date()
     })
 
     const user = await newUser.save()
@@ -52,10 +55,7 @@ const login = (req, res) => {
             if (!user.isActive) return res.status(301).json("Account non confirmed")
 
             if (bcrypt.compareSync(psw, user.password)) {
-                const authToken = jwt.sign({
-                    user: user._id,
-                    roles: user.roles,
-                }, keys.SECRET)
+                const authToken = generateMainToken(user._id, user.roles, keys.SECRET, {}, user.lastPasswordChange)
                 res.json({ authToken })
             }
             else res.status(400).json("Wrong password... Retry!")
@@ -86,7 +86,7 @@ const setRoles = async (req, res) => {
     const allowed = Object.values(UserRoles)
 
     const difference = differenceBetweenArrays(roles, allowed)
-    if(difference.length > 0)
+    if (difference.length > 0)
         return res.status(422).json(`${JSON.stringify(difference)} are not valid roles `)
 
 
@@ -99,10 +99,25 @@ const setRoles = async (req, res) => {
 }
 
 
+const generateUserSessionToken = async (req, res) => {
+    const user = await User.findOne({_id:req.decoded.id})
+    if(!user) res.status(404).json("User not found")
+
+    try {
+        const result = generateSessionToken(req.token, keys.SECRET, user.lastPasswordChange)
+        res.json({ authToken: result })
+    } catch (error) {
+        res.status(301).json(error.message)
+    }
+
+}
+
+
 
 module.exports = {
     createUser,
     login,
     activate,
-    setRoles
+    setRoles,
+    generateUserSessionToken
 }

@@ -20,6 +20,10 @@ const userSchema = new Schema({
         required: true,
         trim: true
     },
+    lastPasswordChange: {
+        type: Date,
+        required:true
+    },
     isActive: {
         required: true,
         type: Boolean

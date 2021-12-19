@@ -1,11 +1,13 @@
 const router = require("express").Router()
 const userController = require("../controllers/user.controller")
 const { check } = require('express-validator')
+const UserRoles = require("../config/userRoles")
 const {
     checkToken,
+    tokenTypes,
     restrictTo
-} = require("../middleware/middleware")
-const UserRoles = require("../config/userRoles")
+} = require("simple-jwt-auth-protocol")
+
 
 router.post("/signup", [
     check("email").isEmail().withMessage("Please use a valid email! "),
@@ -24,7 +26,9 @@ router.post("/login", [
 
 router.get("/activate", userController.activate)
 
-router.post("/set-roles", checkToken, restrictTo([UserRoles.ADMIN]), userController.setRoles)
+router.get("/generate-session-token",checkToken(tokenTypes.MAIN), userController.generateUserSessionToken)
+
+router.post("/set-roles", checkToken(tokenTypes.SESSION), restrictTo([UserRoles.ADMIN]), userController.setRoles)
 
 
 

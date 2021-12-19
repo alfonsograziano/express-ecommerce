@@ -1,22 +1,35 @@
 const mongoose = require("mongoose")
 const Schema = mongoose.Schema
 
+const EUR = "EUR"
+
 const productSchema = new Schema({
     name: {
-        it: String
+        type: String,
+        required: true
     },
     description: {
-        it: String
+        type: String
     },
-    price: Number,
+    price: {
+        type: Number,
+        required: true
+    },
+    currency: {
+        type: String,
+        required: true,
+        default: EUR
+    },
     images: {
         primary: String,
     },
     deleted: {
+        type: Boolean,
         required: true,
         default: false
     },
     visible: {
+        type: Boolean,
         required: true,
         default: true
     },

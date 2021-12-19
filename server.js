@@ -6,6 +6,10 @@ const keys = require("./config/keys")
 const v8 = require("v8")
 const logger = require("./services/logger")
 
+//I set the secret for the auth middlewares to check tokens
+const { setSecret } = require("simple-jwt-auth-protocol")
+setSecret(keys.SECRET)
+
 require("log-timestamp")
 require("dotenv").config()
 
