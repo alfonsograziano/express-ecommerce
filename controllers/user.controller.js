@@ -69,9 +69,10 @@ const login = (req, res) => {
 
 const activate = (req, res) => {
     User.findOne({ _id: req.query.id })
-        .then(user => {
+        .then(async user => {
             user.isActive = true
-            user.save()
+            await user.save()
+            onPostActivateUser(user.toObject())
             res.redirect(keys.SUCCESS_USER_ACTIVATION_URL)
         })
         .catch(() => res.redirect(keys.ERROR_USER_ACTIVATION_URL))
@@ -112,6 +113,10 @@ const generateUserSessionToken = async (req, res) => {
 
 }
 
+
+const onPostActivateUser = user => {
+    //Here you can send a welcome email, ask for preferences or everything else
+}
 
 
 module.exports = {

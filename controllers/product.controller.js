@@ -1,6 +1,8 @@
 const Product = require("../models/product.model")
 const { validationResult } = require('express-validator')
-
+const logger = require("../services/logger")
+const fs = require("fs")
+const { uploadToS3 } = require("../services/fileUpload")
 
 const add = async (req, res) => {
     const errors = validationResult(req)
@@ -47,6 +49,8 @@ const deleteProduct = async (req, res) => {
     res.json(result)
 }
 
+//All the product updates
+
 const update = async (req, res) => {
     const id = req.body.id
     const updates = req.body.updates
@@ -59,15 +63,41 @@ const updateCategories = async (req, res) => {
     const id = req.body.id
     const categories = req.body.categories
 
-    if(!Array.isArray(categories)) return res.status(422).json("You should pass an array of categories")
+    if (!Array.isArray(categories)) return res.status(422).json("You should pass an array of categories")
 
     //TODO: Add check if all categories are valid
 
-    Product.findOneAndUpdate({ _id: id}, {
+    Product.findOneAndUpdate({ _id: id }, {
         categories: categories
     })
-    .then(doc => res.json(`Categories updated for ${doc.name}`))
-    .catch(err => res.status(422).json(err))
+        .then(doc => res.json(`Categories updated for ${doc.name}`))
+        .catch(err => res.status(422).json(err))
+}
+
+const updatePrimaryImage = async (req, res) => {
+    const id = req.body.id
+    const file = req.file
+
+
+    try {
+        let file_data = fs.readFileSync(file.path)
+        const product = await Product.findOne({ _id: id })
+        const result = await uploadToS3(
+            { data: file_data, mimetype: "image/jpeg" },
+            `products/images/${file.originalname}`)
+        product.images = {
+            ...product.images,
+            primary: result.Location
+        }
+
+        await product.save()
+        fs.unlinkSync(file.path)
+        res.json("Product primary image updated")
+    }
+    catch (error) {
+        logger.error(error.message)
+        res.status(404).json(error)
+    }
 }
 
 module.exports = {
@@ -76,5 +106,6 @@ module.exports = {
     update,
     get,
     getByCategory,
-    updateCategories
+    updateCategories,
+    updatePrimaryImage
 }
