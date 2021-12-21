@@ -26,10 +26,17 @@ router.post("/login", [
 
 router.get("/activate", userController.activate)
 
-router.get("/generate-session-token",checkToken(tokenTypes.MAIN), userController.generateUserSessionToken)
+router.get("/reset-password", userController.resetPassword)
 
-router.post("/set-roles", checkToken(tokenTypes.SESSION), restrictTo([UserRoles.ADMIN]), userController.setRoles)
 
+
+router.get("/generate-session-token", checkToken(tokenTypes.MAIN), userController.generateUserSessionToken)
+
+router.post("/set-roles", checkToken(), restrictTo([UserRoles.ADMIN]), userController.setRoles)
+
+router.post("/change-password", [
+    check("password").isLength({ min: 6 }).withMessage("Password lenght min is 6 charachers")
+], checkToken(), userController.changePassword)
 
 
 module.exports = router

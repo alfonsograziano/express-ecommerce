@@ -9,8 +9,6 @@ function uploadToS3(file, filename) {
     region: 'eu-west-1'
   })
 
-  console.log(s3bucket)
-
   return new Promise((resolve, reject) => {
     s3bucket.createBucket(function () {
       var params = {

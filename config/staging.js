@@ -12,4 +12,5 @@ module.exports = {
     IAM_USER_KEY: process.env.IAM_USER_KEY,
     IAM_USER_SECRET: process.env.IAM_USER_SECRET,
     BUCKET_NAME: process.env.BUCKET_NAME,
+    SITE_NAME: process.env.SITE_NAME
 }

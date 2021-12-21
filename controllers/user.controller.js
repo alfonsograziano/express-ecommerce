@@ -8,6 +8,12 @@ const {
     generateSessionToken,
 } = require("simple-jwt-auth-protocol")
 
+const {
+    sendWelcomeEmail,
+    sendSignupEmail,
+    sendPasswordRecoveryEmail
+} = require("../services/sendEmail")
+
 const createUser = async (req, res) => {
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
@@ -35,7 +41,7 @@ const createUser = async (req, res) => {
 
     const user = await newUser.save()
     if (!user) return res.status(401).json("Error")
-
+    onPostSignup(user.toObject())
     return res.json("Account created!")
 }
 
@@ -101,8 +107,8 @@ const setRoles = async (req, res) => {
 
 
 const generateUserSessionToken = async (req, res) => {
-    const user = await User.findOne({_id:req.decoded.id})
-    if(!user) res.status(404).json("User not found")
+    const user = await User.findOne({ _id: req.decoded.id })
+    if (!user) res.status(404).json("User not found")
 
     try {
         const result = generateSessionToken(req.token, keys.SECRET, user.lastPasswordChange)
@@ -116,6 +122,43 @@ const generateUserSessionToken = async (req, res) => {
 
 const onPostActivateUser = user => {
     //Here you can send a welcome email, ask for preferences or everything else
+    sendWelcomeEmail(user.email)
+}
+
+const onPostSignup = user => {
+    const url = `${keys.SERVER_URL}/user/activate?id=${user._id}`
+    sendSignupEmail(user.email, url)
+}
+
+const changePassword = (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
+    const [user, pw, salt] = [req.decoded.id, req.body.password.trim(), bcrypt.genSaltSync(10)];
+    const criptedPw = bcrypt.hashSync(pw, salt);
+
+    User.findByIdAndUpdate({ _id: user },
+        {
+            password: criptedPw,
+            lastPasswordChange: new Date()
+        },
+        { new: true, useFindAndModify: true })
+        .then(data => res.json(data))
+        .catch(error => console.log(error.message))
+}
+
+const resetPassword = async (req, res) => {
+    const email = req.query.email
+    const user = await User.findOne({ email: email })
+    if (!user) return res.status(404).json("Cannot find email")
+
+    const mainToken = generateMainToken(user._id, user.roles, keys.SECRET, {}, user.lastPasswordChange)
+    const sessionToken = generateSessionToken(mainToken, keys.SECRET, user.lastPasswordChange)
+    const url = `${keys.CLIENT_URL}/forgot?token=${sessionToken}`
+    await sendPasswordRecoveryEmail(email, url)
+
+    res.json("Recovery email sent...")
 }
 
 
@@ -124,5 +167,7 @@ module.exports = {
     login,
     activate,
     setRoles,
-    generateUserSessionToken
+    generateUserSessionToken,
+    resetPassword,
+    changePassword
 }
