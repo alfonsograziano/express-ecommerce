@@ -1,20 +1,27 @@
-const OrderStatus = {
+const status = {
     DRAFT: {
         value: "draft",
         description: "This is the 'cart'. When an user add an item to the cart, a new order in draft is created"
     },
     PENDING: {
-        value:"pending",
-        description:"When you click che checkout page, the orer becomes in pending",
+        value: "pending",
+        description: "When you click che checkout page, the orer becomes in pending",
     },
-    FULLFILLED:{
+    FULLFILLED: {
         value: "fullfilled",
-        description:"When you complete the order and the payment is fullfilled the order becomes fullfilled"
+        description: "When you complete the order and the payment is fullfilled the order becomes fullfilled"
     },
-    CANCELED:{
+    CANCELED: {
         value: "canceled",
-        description:"If an user requires the cancellation of the order, it becomes canceled"
+        description: "If an user requires the cancellation of the order, it becomes canceled"
     }
+}
+
+const OrderStatus = {
+    DRAFT: "draft",
+    PENDING: "pending",
+    FULLFILLED: "fullfilled",
+    CANCELED: "canceled",
 }
 
 module.exports = OrderStatus

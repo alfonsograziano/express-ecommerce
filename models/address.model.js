@@ -3,6 +3,9 @@ const Schema = mongoose.Schema
 
 
 const addressSchema = new Schema({
+    //TODO: understand what fields are required and what aren't
+    firstName: String,
+    lastName: String, 
     country: String,
     state: String,
     city: String,
