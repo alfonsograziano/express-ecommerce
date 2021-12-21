@@ -5,5 +5,12 @@ module.exports = {
     "PORT": process.env.PORT,
     "SECRET": "THIS_IS_MY_STRONG_SECRET",
     "SUCCESS_USER_ACTIVATION_URL":"https://www.google.it/?success=true",
-    "ERROR_USER_ACTIVATION_URL":"https://www.google.it/?success=false"
+    "ERROR_USER_ACTIVATION_URL":"https://www.google.it/?success=false",
+    "SMTP_PORT":process.env.SMTP_PORT,
+    "SMTP_SERVER":process.env.SMTP_SERVER,
+    "EMAIL":process.env.EMAIL,
+    "PSW_EMAIL":process.env.PSW_EMAIL,
+    "IAM_USER_KEY": process.env.IAM_USER_KEY,
+    "IAM_USER_SECRET": process.env.IAM_USER_SECRET,
+    "BUCKET_NAME": process.env.BUCKET_NAME,
 }
