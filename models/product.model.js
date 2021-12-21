@@ -38,8 +38,8 @@ const productSchema = new Schema({
         default: true
     },
     categories: [{
-        // type: mongoose.Schema.Types.ObjectId,
-        // ref: 'Address'
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Category'
     }]
 
 }, {

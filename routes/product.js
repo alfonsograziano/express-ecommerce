@@ -18,8 +18,9 @@ router.post("/add", [
 
 router.delete("/delete",  checkToken(), restrictTo([UserRoles.SHOP_MANAGER]), productController.deleteProduct)
 
-router.delete("/update",  checkToken(), restrictTo([UserRoles.SHOP_MANAGER]), productController.update)
+router.post("/update/categories",  checkToken(), restrictTo([UserRoles.SHOP_MANAGER]), productController.updateCategories)
 
+router.get("/category", checkToken(), productController.getByCategory)
 
 
 

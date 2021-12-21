@@ -38,11 +38,17 @@ const orderSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     },
-    shipTo:{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Address',
-        //This field is not required in case of digital products
-        required: false
+    shipTo: {
+        //I need to mantain redoundant info here 
+        //So I can just import the address schema or copy it
+        firstName: String,
+        lastName: String,
+        country: String,
+        state: String,
+        city: String,
+        zip: String,
+        address: String,
+        notes: String
     }
 }, {
     timestamps: true,

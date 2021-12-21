@@ -25,6 +25,17 @@ const get = (req, res) => {
 
     const filter = req.body.filter || {}
     Product.find(filter)
+        .populate("categories")
+        .then(products => res.json(products))
+        .catch(err => res.status(400).json(err))
+}
+
+
+const getByCategory = (req, res) => {
+
+    const categoryId = req.body.categoryId
+    Product.find({ categories: categoryId })
+        .populate("categories")
         .then(products => res.json(products))
         .catch(err => res.status(400).json(err))
 }
@@ -40,8 +51,23 @@ const update = async (req, res) => {
     const id = req.body.id
     const updates = req.body.updates
 
-    const result = await Product.findOneAndUpdate({ _id: id, deleted: false }, updates)
+    const result = await Product.findOneAndUpdate({ _id: id }, updates)
     res.json(result)
+}
+
+const updateCategories = async (req, res) => {
+    const id = req.body.id
+    const categories = req.body.categories
+
+    if(!Array.isArray(categories)) return res.status(422).json("You should pass an array of categories")
+
+    //TODO: Add check if all categories are valid
+
+    Product.findOneAndUpdate({ _id: id}, {
+        categories: categories
+    })
+    .then(doc => res.json(`Categories updated for ${doc.name}`))
+    .catch(err => res.status(422).json(err))
 }
 
 module.exports = {
@@ -49,4 +75,6 @@ module.exports = {
     deleteProduct,
     update,
     get,
+    getByCategory,
+    updateCategories
 }
